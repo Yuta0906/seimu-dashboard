@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>政務活動費ダッシュボード</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif; background: #f4f6f9; color: #333; font-size: 14px; }
+
+  header {
+    background: #1a3a5c;
+    color: white;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  header h1 { font-size: 17px; font-weight: bold; }
+  header .header-right { font-size: 13px; opacity: 0.8; display: flex; align-items: center; gap: 16px; }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 20px 16px; }
+
+  /* 設定バー */
+  .settings-bar {
+    background: white;
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    flex-wrap: wrap;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .settings-bar .field label { display: block; font-size: 12px; color: #888; margin-bottom: 4px; }
+  .settings-bar select, .settings-bar input[type=number] {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 14px;
+  }
+  .settings-bar select { width: 140px; }
+  .settings-bar input[type=number] { width: 180px; }
+  .btn { border: none; border-radius: 6px; padding: 8px 18px; font-size: 13px; cursor: pointer; font-weight: bold; }
+  .btn-primary { background: #1a3a5c; color: white; }
+  .btn-primary:hover { background: #2a5080; }
+  .btn-secondary { background: #e8ecf0; color: #444; }
+  .btn-secondary:hover { background: #d0d7e0; }
+  .btn-blue { background: #2979ff; color: white; }
+  .btn-blue:hover { background: #1565c0; }
+
+  /* サマリーカード */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: white;
+    border-radius: 10px;
+    padding: 16px 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border-top: 3px solid #ccc;
+  }
+  .card.blue   { border-color: #2979ff; }
+  .card.green  { border-color: #2e7d32; }
+  .card.orange { border-color: #e65100; }
+  .card.red    { border-color: #c62828; }
+  .card.red:hover { background: #fff5f5; }
+  .card.red.active { background: #ffebee; box-shadow: 0 0 0 2px #c62828; }
+  .card.teal   { border-color: #00796b; }
+  .card.purple { border-color: #6a1b9a; }
+  .card.purple .card-value { color: #6a1b9a; }
+  .card.purple:hover { background: #f3e5f5; }
+  .card.purple.active { background: #ede7f6; box-shadow: 0 0 0 2px #6a1b9a; }
+  .card-label { font-size: 11px; color: #888; margin-bottom: 6px; line-height: 1.4; }
+  .card-value { font-size: 20px; font-weight: bold; }
+  .card.blue   .card-value { color: #1565c0; }
+  .card.green  .card-value { color: #2e7d32; }
+  .card.orange .card-value { color: #e65100; }
+  .card.red    .card-value { color: #c62828; }
+  .card.teal   .card-value { color: #00796b; }
+  .card-sub { font-size: 11px; color: #bbb; margin-top: 4px; }
+
+  /* 進捗バー */
+  .progress-wrap {
+    background: white;
+    border-radius: 10px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .progress-label { font-size: 12px; color: #666; margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .progress-bg { background: #e0e0e0; border-radius: 8px; height: 12px; overflow: hidden; }
+  .progress-bar { height: 100%; border-radius: 8px; transition: width 0.4s; background: #2979ff; }
+  .progress-bar.warn { background: #e65100; }
+  .progress-bar.over { background: #c62828; }
+
+  /* 費目別 */
+  .section-title {
+    font-size: 13px;
+    font-weight: bold;
+    color: #444;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #e0e0e0;
+  }
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .cat-card {
+    background: white;
+    border-radius: 7px;
+    padding: 10px 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .cat-name { font-size: 12px; color: #555; }
+  .cat-amount { font-size: 14px; font-weight: bold; color: #1a3a5c; }
+
+  /* 入力フォーム */
+  .form-wrap {
+    background: white;
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .form-group label { display: block; font-size: 11px; color: #888; margin-bottom: 3px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 7px 9px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: #2979ff;
+    box-shadow: 0 0 0 2px rgba(41,121,255,0.12);
+  }
+  .span2 { grid-column: span 2; }
+  .span3 { grid-column: span 3; }
+  .calc-preview {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #1565c0;
+    background: #e8f0fe;
+    padding: 8px 12px;
+    border-radius: 6px;
+    display: none;
+  }
+  .form-actions { margin-top: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+  /* テーブル */
+  .table-wrap {
+    background: white;
+    border-radius: 10px;
+    padding: 18px 22px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    overflow-x: auto;
+    margin-bottom: 30px;
+  }
+  .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+  .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .filter-bar select, .filter-bar input { border: 1px solid #ddd; border-radius: 5px; padding: 5px 8px; font-size: 12px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th {
+    background: #f5f7fa;
+    color: #555;
+    text-align: left;
+    padding: 9px 10px;
+    font-size: 11px;
+    border-bottom: 2px solid #e0e0e0;
+    white-space: nowrap;
+  }
+  th.sortable { cursor: pointer; user-select: none; }
+  th.sortable:hover { background: #eaecf0; }
+  th.sort-asc::after  { content: ' ▲'; font-size: 10px; }
+  th.sort-desc::after { content: ' ▼'; font-size: 10px; }
+  td { padding: 9px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafbff; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .jibara { text-align: right; color: #c62828; font-variant-numeric: tabular-nums; }
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-size: 10px;
+    background: #e3f2fd;
+    color: #1565c0;
+    white-space: nowrap;
+  }
+  .badge.orange { background: #fff3e0; color: #e65100; }
+  .badge.green { background: #e8f5e9; color: #2e7d32; }
+  .btn-del { background: none; border: 1px solid #ffcdd2; color: #c62828; border-radius: 4px; padding: 3px 8px; cursor: pointer; font-size: 11px; }
+  .btn-del:hover { background: #ffebee; }
+  .seisan-btn { background: none; border: 1px solid #ddd; border-radius: 4px; padding: 3px 8px; cursor: pointer; font-size: 12px; color: #999; white-space: nowrap; }
+  .seisan-btn.done { background: #e8f5e9; border-color: #a5d6a7; color: #2e7d32; }
+  tr.seisan-done td { opacity: 0.5; }
+  .empty-state { text-align: center; color: #bbb; padding: 40px; font-size: 13px; }
+
+  .note { font-size: 11px; color: #bbb; text-align: center; margin-bottom: 20px; }
+
+  @media (max-width: 1100px) {
+    .cards { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .cards { grid-template-columns: 1fr 1fr; }
+    .form-grid { grid-template-columns: 1fr 1fr; }
+    .span2, .span3 { grid-column: span 1; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>政務活動費 ダッシュボード</h1>
+  <div class="header-right">
+    <span id="header-nendo">― 年度</span>
+    <span id="header-nokori" style="background:rgba(255,255,255,0.15);padding:3px 10px;border-radius:12px;"></span>
+    <span id="gh-status" onclick="openGHModal()" style="cursor:pointer;font-size:12px;padding:3px 10px;border-radius:12px;background:rgba(255,255,255,0.1)" title="GitHub連携設定">☁ 未設定</span>
+  </div>
+</header>
+
+<!-- GitHub設定モーダル -->
+<div id="gh-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:none;align-items:center;justify-content:center">
+  <div style="background:white;border-radius:12px;padding:28px;width:460px;max-width:95vw">
+    <h3 style="margin-bottom:16px;font-size:16px">☁ GitHub連携設定</h3>
+    <p style="font-size:12px;color:#666;margin-bottom:16px">設定するとデータがGitHubに自動保存され、事務員さんが閲覧用URLからリアルタイムで参照できます。</p>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div>
+        <label style="font-size:12px;color:#888;display:block;margin-bottom:3px">GitHubリポジトリ（例: yuta-kaneko01/seimu-dashboard）</label>
+        <input id="gh-repo-input" type="text" placeholder="owner/repo" style="width:100%;border:1px solid #ccc;border-radius:6px;padding:7px 10px;font-size:13px">
+      </div>
+      <div>
+        <label style="font-size:12px;color:#888;display:block;margin-bottom:3px">Personal Access Token（管理者のみ・書込権限 Contents: write）</label>
+        <input id="gh-token-input" type="password" placeholder="ghp_xxxxxxxxxxxx" style="width:100%;border:1px solid #ccc;border-radius:6px;padding:7px 10px;font-size:13px">
+        <p style="font-size:11px;color:#aaa;margin-top:4px">事務員さん側は空欄のままでOK（読み取り専用）</p>
+      </div>
+    </div>
+    <div style="margin-top:20px;display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="closeGHModal()" style="border:1px solid #ddd;background:white;border-radius:6px;padding:7px 16px;cursor:pointer">キャンセル</button>
+      <button onclick="clearGHConfig()" style="border:1px solid #ffcdd2;background:white;color:#c62828;border-radius:6px;padding:7px 16px;cursor:pointer">設定を削除</button>
+      <button onclick="saveGHConfig()" style="background:#1a3a5c;color:white;border:none;border-radius:6px;padding:7px 16px;cursor:pointer;font-weight:bold">保存</button>
+    </div>
+    <div id="gh-modal-status" style="margin-top:12px;font-size:12px;text-align:center"></div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- 設定バー -->
+  <div class="settings-bar">
+    <div class="field">
+      <label>会計年度</label>
+      <select id="nendo-select" onchange="changeNendo()">
+        <option value="2024">2024年度</option>
+        <option value="2025">2025年度</option>
+        <option value="2026" selected>2026年度</option>
+        <option value="2027">2027年度</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>年間交付額（円）</label>
+      <input type="number" id="kofu-input" placeholder="例: 1200000" step="10000">
+    </div>
+    <div>
+      <button class="btn btn-primary" onclick="saveSettings()">設定を保存</button>
+    </div>
+    <div style="margin-left:auto; display:flex; gap:8px;">
+      <button class="btn btn-secondary" onclick="exportCSV()">CSVエクスポート</button>
+      <button class="btn btn-blue" onclick="document.getElementById('import-modal').style.display='flex'">セムカンCSVを取り込む</button>
+    </div>
+  </div>
+
+  <!-- CSV取り込みモーダル -->
+  <div id="import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;">
+    <div style="background:white;border-radius:12px;padding:28px 32px;max-width:700px;width:95%;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h2 style="font-size:16px;color:#1a3a5c;">セムカンCSVを取り込む</h2>
+        <button onclick="closeImport()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#999;">×</button>
+      </div>
+
+      <div style="background:#e8f0fe;border-radius:8px;padding:12px 14px;font-size:12px;color:#1565c0;margin-bottom:16px;line-height:1.8;">
+        <strong>【取り込み手順】</strong><br>
+        ① セムカンの左メニュー「<strong>帳票</strong>」を開く<br>
+        ② 右上の「<strong>CSVダウンロード</strong>」ボタンを押してCSVを保存<br>
+        ③ 下の「ファイルを選択」からそのCSVを選ぶ<br>
+        ※ ExcelでCSVを開いてコピーして貼り付けでもOK
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div class="section-title" style="margin-bottom:8px;">方法①：CSVファイルを選択</div>
+        <input type="file" id="csv-file" accept=".csv,text/csv" onchange="readCSVFile(this)"
+          style="border:2px dashed #ccc;border-radius:8px;padding:16px;width:100%;font-size:13px;cursor:pointer;">
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div class="section-title" style="margin-bottom:8px;">方法②：データを貼り付け（ExcelやCSVのテキストをそのまま貼る）</div>
+        <textarea id="csv-paste" rows="6" placeholder="ここにセムカンのCSVまたはExcelからコピーしたデータを貼り付けてください"
+          style="width:100%;border:1px solid #ddd;border-radius:6px;padding:10px;font-size:12px;font-family:monospace;"
+          oninput="previewCSV()"></textarea>
+      </div>
+
+      <!-- 列マッピング設定（初回のみ表示） -->
+      <div id="mapping-setup" style="display:none;margin-bottom:16px;">
+        <div class="section-title" style="margin-bottom:8px;color:#e65100;">⚠ 列の対応を手動で設定してください</div>
+        <p style="font-size:12px;color:#888;margin-bottom:10px;">CSVの列名が自動認識できませんでした。セムカンCSVの各列が何に対応するか選んでください。</p>
+        <div id="manual-mapping-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;"></div>
+        <button class="btn btn-blue" onclick="applyManualMapping()" style="margin-top:10px;font-size:12px;padding:6px 14px;">この設定で読み込む</button>
+      </div>
+
+      <div id="import-preview" style="display:none;">
+        <div class="section-title" style="margin-bottom:6px;">プレビュー</div>
+        <div id="col-mapping" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;font-size:11px;"></div>
+        <div id="preview-table-wrap" style="overflow-x:auto;max-height:240px;overflow-y:auto;border:1px solid #e0e0e0;border-radius:6px;"></div>
+        <div id="import-count" style="font-size:12px;color:#666;margin-top:8px;"></div>
+      </div>
+
+      <div id="import-error" style="display:none;background:#ffebee;color:#c62828;padding:10px;border-radius:6px;font-size:12px;margin-top:8px;"></div>
+
+      <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end;">
+        <button class="btn btn-secondary" onclick="closeImport()">キャンセル</button>
+        <button class="btn btn-blue" id="import-btn" onclick="doImport()" style="display:none;">取り込む</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- サマリーカード -->
+  <div class="cards">
+    <div class="card blue">
+      <div class="card-label">年間交付額</div>
+      <div class="card-value" id="c-kofu">未設定</div>
+      <div class="card-sub">交付予算総額</div>
+    </div>
+    <div class="card orange">
+      <div class="card-label">支出合計（按分前）</div>
+      <div class="card-value" id="c-total">¥0</div>
+      <div class="card-sub">領収書ベースの実支出</div>
+    </div>
+    <div class="card teal">
+      <div class="card-label">政務活動費充当額</div>
+      <div class="card-value" id="c-anbu">¥0</div>
+      <div class="card-sub">按分後・交付から差引く額</div>
+    </div>
+    <div class="card green">
+      <div class="card-label">交付残額</div>
+      <div class="card-value" id="c-nokori">―</div>
+      <div class="card-sub">交付額 − 充当額</div>
+    </div>
+    <div class="card red" id="card-jibara" onclick="toggleJibaraFilter()" style="cursor:pointer" title="クリックで自己負担がある支出のみ表示">
+      <div class="card-label">自己負担合計 <span id="jibara-filter-badge" style="display:none;font-size:10px;background:#c62828;color:white;border-radius:8px;padding:1px 6px;margin-left:4px">絞込中 ✕</span></div>
+      <div class="card-value" id="c-jibara">¥0</div>
+      <div class="card-sub">自分の財布から出る額</div>
+    </div>
+    <div class="card purple" id="card-miseisan" onclick="toggleMiseisanFilter()" style="cursor:pointer" title="クリックで未精算の立替支出のみ表示">
+      <div class="card-label">未精算立替額 <span id="miseisan-filter-badge" style="display:none;font-size:10px;background:#6a1b9a;color:white;border-radius:8px;padding:1px 6px;margin-left:4px">絞込中 ✕</span></div>
+      <div class="card-value" id="c-miseisan">¥0</div>
+      <div class="card-sub">個人立替中・事務所から返金待ち</div>
+    </div>
+  </div>
+
+  <!-- 進捗バー -->
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>交付額に対する充当率</span>
+      <span id="progress-pct">―</span>
+    </div>
+    <div class="progress-bg">
+      <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- 経費項目別集計 -->
+  <div class="section-title">経費項目別集計（充当額）</div>
+  <div class="category-grid" id="category-grid"></div>
+
+  <!-- 入力フォーム -->
+  <div class="form-wrap">
+    <div class="section-title">支出を追加（セムカンと同じ内容で入力）</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>支出日</label>
+        <input type="date" id="f-date">
+      </div>
+      <div class="form-group">
+        <label>経費項目</label>
+        <select id="f-cat">
+          <option value="調査研究費">調査研究費</option>
+          <option value="広報費">広報費</option>
+          <option value="広聴費">広聴費</option>
+          <option value="要請・陳情活動費">要請・陳情活動費</option>
+          <option value="会議費">会議費</option>
+          <option value="研修費">研修費</option>
+          <option value="資料購入費">資料購入費</option>
+          <option value="事務費">事務費</option>
+          <option value="その他">その他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>経費細目</label>
+        <input type="text" id="f-subcat" placeholder="例：交通費、印刷費 等">
+      </div>
+      <div class="form-group span2">
+        <label>摘要（支出内容）</label>
+        <input type="text" id="f-desc" placeholder="例：県議会視察 東京都・国土交通省">
+      </div>
+      <div class="form-group">
+        <label>支払先</label>
+        <input type="text" id="f-payto" placeholder="例：JR東日本、コンビニ等">
+      </div>
+      <div class="form-group">
+        <label>支出金額（円）</label>
+        <input type="number" id="f-amount" placeholder="0" step="1" oninput="updatePreview()">
+      </div>
+      <div class="form-group">
+        <label>充当方法</label>
+        <select id="f-method" onchange="updateMethodUI()">
+          <option value="full">全額充当</option>
+          <option value="anbu" selected>按分</option>
+          <option value="partial">一部充当</option>
+          <option value="exclude">充当除外</option>
+        </select>
+      </div>
+      <div class="form-group" id="anbu-wrap">
+        <label>按分率（%）</label>
+        <select id="f-anburitsu" onchange="updatePreview()">
+          <option value="90">90%</option>
+          <option value="75">75%</option>
+          <option value="67">67%</option>
+          <option value="50" selected>50%</option>
+          <option value="33">33%</option>
+          <option value="30">30%</option>
+          <option value="25">25%</option>
+          <option value="20">20%</option>
+          <option value="10">10%</option>
+        </select>
+      </div>
+      <div class="form-group" id="partial-wrap" style="display:none">
+        <label>充当金額（円）</label>
+        <input type="number" id="f-partial" placeholder="0" step="1" oninput="updatePreview()">
+      </div>
+      <div class="form-group span2">
+        <label>備考（セムカン申請番号等）</label>
+        <input type="text" id="f-note" placeholder="例：申請番号#123、セムカン入力済み">
+      </div>
+    </div>
+    <div class="calc-preview" id="calc-preview"></div>
+    <div class="form-actions">
+      <button class="btn btn-blue" onclick="addEntry()">追加する</button>
+      <button class="btn btn-secondary" onclick="clearForm()">クリア</button>
+    </div>
+  </div>
+
+  <!-- 経費一覧 -->
+  <div class="table-wrap">
+    <div class="table-header">
+      <div class="section-title" style="margin:0">支出一覧</div>
+      <div class="filter-bar">
+        <select id="f-filter-cat" onchange="renderTable()">
+          <option value="">すべての経費項目</option>
+          <option>調査研究費</option>
+          <option>広報費</option>
+          <option>広聴費</option>
+          <option>要請・陳情活動費</option>
+          <option>会議費</option>
+          <option>研修費</option>
+          <option>資料購入費</option>
+          <option>事務費</option>
+          <option>その他</option>
+        </select>
+        <input type="month" id="f-filter-month" onchange="renderTable()" style="font-size:12px;padding:5px 8px;border:1px solid #ddd;border-radius:5px;">
+        <button class="btn btn-secondary" onclick="clearFilter()" style="font-size:11px;padding:5px 10px;">フィルター解除</button>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th class="sortable" style="width:90px" onclick="setSort('date')">支出日</th>
+          <th class="sortable" onclick="setSort('cat')">経費項目</th>
+          <th>経費細目</th>
+          <th>摘要</th>
+          <th>支払先</th>
+          <th class="sortable num" onclick="setSort('amount')">支出金額</th>
+          <th>充当方法</th>
+          <th class="sortable num" onclick="setSort('charge')">充当額</th>
+          <th class="sortable num" style="color:#c62828" onclick="setSort('jibara')">自己負担</th>
+          <th class="sortable" style="width:72px;color:#6a1b9a" onclick="setSort('tatekae')">精算</th>
+          <th>備考</th>
+          <th class="sortable" style="width:80px;color:#888" onclick="setSort('registeredAt')">登録日</th>
+          <th style="width:44px"></th>
+        </tr>
+      </thead>
+      <tbody id="entry-tbody"></tbody>
+      <tfoot id="entry-tfoot"></tfoot>
+    </table>
+  </div>
+
+  <div class="note">データはブラウザのlocalStorageに保存されます。同じブラウザ・同じパソコンであれば次回も表示されます。</div>
+
+</div>
+
+<script>
+// ---- データ管理 ----
+function getNendo() { return document.getElementById('nendo-select').value; }
+function dataKey()  { return `seimu_${getNendo()}_entries`; }
+function setKey()   { return `seimu_${getNendo()}_settings`; }
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(dataKey()) || '[]'); } catch(e) { return []; }
+}
+function saveData(d) {
+  localStorage.setItem(dataKey(), JSON.stringify(d));
+  ghPush(d); // GitHubに非同期保存
+}
+function loadSettings() {
+  try { return JSON.parse(localStorage.getItem(setKey()) || '{}'); } catch(e) { return {}; }
+}
+function saveSettings() {
+  const kofu = parseInt(document.getElementById('kofu-input').value, 10) || 0;
+  const s = loadSettings();
+  s.kofu = kofu;
+  localStorage.setItem(setKey(), JSON.stringify(s));
+  renderAll();
+  alert('保存しました');
+}
+async function changeNendo() {
+  const s = loadSettings();
+  document.getElementById('kofu-input').value = s.kofu || '';
+  document.getElementById('header-nendo').textContent = getNendo() + ' 年度';
+  await ghPull(); // 年度切替時にGitHubから最新を取得
+  renderAll();
+}
+
+// ---- GitHub連携 ----
+const GH_DEFAULT_REPO = 'Yuta0906/seimu-dashboard'; // セットアップ済み
+
+function ghConfig() {
+  try { return JSON.parse(localStorage.getItem('gh_config') || 'null'); } catch(e) { return null; }
+}
+function ghRepo() { const c = ghConfig(); return (c && c.repo) || GH_DEFAULT_REPO; }
+function ghIsAdmin() { const c = ghConfig(); return !!(c && c.token); }
+
+function ghUpdateStatus() {
+  const c = ghConfig();
+  const el = document.getElementById('gh-status');
+  if (!el) return;
+  if (c && c.token) {
+    el.textContent = '☁ 管理者'; el.style.background = 'rgba(41,121,255,0.4)';
+  } else {
+    el.textContent = '☁ 閲覧中'; el.style.background = 'rgba(255,255,255,0.2)';
+  }
+}
+
+async function ghPull() {
+  const repo = ghRepo();
+  if (!repo) return;
+  try {
+    const url = `https://raw.githubusercontent.com/${repo}/main/data/seimu_${getNendo()}.json?t=${Date.now()}`;
+    const r = await fetch(url);
+    if (r.ok) {
+      const remote = await r.json();
+      const local  = loadData();
+      // GitHubが空データの場合はローカルを上書きしない
+      if (remote.length > 0 || local.length === 0) {
+        localStorage.setItem(dataKey(), JSON.stringify(remote));
+      }
+      document.getElementById('gh-status').textContent = '☁ 同期済';
+      setTimeout(ghUpdateStatus, 2000);
+    }
+  } catch(e) {}
+}
+
+async function ghPush(data) {
+  const c = ghConfig();
+  if (!c || !c.repo || !c.token) return;
+  const filepath = `data/seimu_${getNendo()}.json`;
+  const apiUrl   = `https://api.github.com/repos/${c.repo}/contents/${filepath}`;
+  const headers  = { 'Authorization': `token ${c.token}`, 'Content-Type': 'application/json' };
+  let sha = null;
+  try { const r = await fetch(apiUrl, { headers }); if (r.ok) { const j = await r.json(); sha = j.sha; } } catch(e) {}
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+  try {
+    const r = await fetch(apiUrl, { method: 'PUT', headers,
+      body: JSON.stringify({ message: `update seimu_${getNendo()}`, content, ...(sha?{sha}:{}) }) });
+    if (r.ok) { document.getElementById('gh-status').textContent = '☁ 保存済'; setTimeout(ghUpdateStatus, 2000); }
+  } catch(e) {}
+}
+
+function openGHModal() {
+  const c = ghConfig();
+  document.getElementById('gh-repo-input').value  = c ? (c.repo  || '') : '';
+  document.getElementById('gh-token-input').value = c ? (c.token || '') : '';
+  document.getElementById('gh-modal-status').textContent = '';
+  document.getElementById('gh-modal').style.display = 'flex';
+}
+function closeGHModal() { document.getElementById('gh-modal').style.display = 'none'; }
+function clearGHConfig() {
+  if (!confirm('GitHub連携設定を削除しますか？')) return;
+  localStorage.removeItem('gh_config');
+  closeGHModal(); ghUpdateStatus();
+}
+function saveGHConfig() {
+  const repo  = document.getElementById('gh-repo-input').value.trim();
+  const token = document.getElementById('gh-token-input').value.trim();
+  if (!repo) { document.getElementById('gh-modal-status').textContent = 'リポジトリ名を入力してください'; return; }
+  localStorage.setItem('gh_config', JSON.stringify({ repo, token, branch: 'main' }));
+  closeGHModal(); ghUpdateStatus();
+  document.getElementById('gh-modal-status').textContent = '';
+  // 設定後すぐにpullして動作確認
+  ghPull().then(() => renderAll());
+  // 閲覧用URLを表示
+  const pagesUrl = `https://${repo.split('/')[0]}.github.io/${repo.split('/')[1]}/`;
+  alert(`設定しました。\n\n事務員さんの閲覧URL:\n${pagesUrl}\n\n※GitHubリポジトリとPages設定が完了していれば閲覧できます。`);
+}
+
+// ---- フォーム ----
+function today() { return new Date().toISOString().slice(0,10); }
+document.getElementById('f-date').value = today();
+
+function updateMethodUI() {
+  const m = document.getElementById('f-method').value;
+  document.getElementById('anbu-wrap').style.display    = m === 'anbu'    ? '' : 'none';
+  document.getElementById('partial-wrap').style.display = m === 'partial' ? '' : 'none';
+  updatePreview();
+}
+
+function calcCharge(e) {
+  if (e.method === 'full')    return e.amount;
+  if (e.method === 'anbu')    return Math.floor(e.amount * e.rate / 100);
+  if (e.method === 'partial') return e.partial;
+  if (e.method === 'exclude') return 0;
+  return e.amount;
+}
+function calcJibara(e) { return e.amount - calcCharge(e); }
+
+function updatePreview() {
+  const amount  = parseInt(document.getElementById('f-amount').value, 10) || 0;
+  const method  = document.getElementById('f-method').value;
+  const rate    = parseInt(document.getElementById('f-anburitsu').value, 10);
+  const partial = parseInt(document.getElementById('f-partial').value, 10) || 0;
+  const el = document.getElementById('calc-preview');
+  if (!amount) { el.style.display = 'none'; return; }
+  let charge, jibara, label;
+  if (method === 'full')    { charge = amount;                    label = '全額充当'; }
+  else if (method === 'anbu')    { charge = Math.floor(amount * rate / 100); label = `按分${rate}%`; }
+  else if (method === 'partial') { charge = partial;             label = '一部充当'; }
+  else                           { charge = 0;                   label = '充当除外'; }
+  jibara = amount - charge;
+  el.style.display = 'block';
+  el.innerHTML = `【${label}】支出 ${fmt(amount)} → <strong>政務活動費充当 ${fmt(charge)}</strong>　自己負担 <span style="color:#c62828">${fmt(jibara)}</span>（小数点以下切捨）`;
+}
+
+function clearForm() {
+  ['f-date','f-subcat','f-desc','f-payto','f-note','f-partial'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = id === 'f-date' ? today() : '';
+  });
+  document.getElementById('f-amount').value = '';
+  document.getElementById('f-method').value = 'anbu';
+  document.getElementById('f-anburitsu').value = '50';
+  updateMethodUI();
+  document.getElementById('calc-preview').style.display = 'none';
+}
+
+function addEntry() {
+  const date    = document.getElementById('f-date').value;
+  const cat     = document.getElementById('f-cat').value;
+  const subcat  = document.getElementById('f-subcat').value.trim();
+  const desc    = document.getElementById('f-desc').value.trim();
+  const payto   = document.getElementById('f-payto').value.trim();
+  const amount  = parseInt(document.getElementById('f-amount').value, 10) || 0;
+  const method  = document.getElementById('f-method').value;
+  const rate    = parseInt(document.getElementById('f-anburitsu').value, 10);
+  const partial = parseInt(document.getElementById('f-partial').value, 10) || 0;
+  const note    = document.getElementById('f-note').value.trim();
+
+  if (!date || !desc || !amount) {
+    alert('支出日・摘要・支出金額は必須です');
+    return;
+  }
+  if (method === 'partial' && (!partial || partial > amount)) {
+    alert('一部充当金額を正しく入力してください（0 < 充当額 ≤ 支出額）');
+    return;
+  }
+
+  const data = loadData();
+  data.push({ id: Date.now(), date, cat, subcat, desc, payto, amount, method, rate, partial, note, registeredAt: today() });
+  data.sort((a, b) => a.date.localeCompare(b.date));
+  saveData(data);
+  clearForm();
+  renderAll();
+}
+
+function deleteEntry(id) {
+  if (!confirm('この支出を削除しますか？')) return;
+  saveData(loadData().filter(e => e.id !== id));
+  renderAll();
+}
+
+function clearFilter() {
+  document.getElementById('f-filter-cat').value = '';
+  document.getElementById('f-filter-month').value = '';
+  filterMiseisanOnly = false;
+  document.getElementById('card-miseisan').classList.remove('active');
+  document.getElementById('miseisan-filter-badge').style.display = 'none';
+  renderTable();
+}
+
+// tatekae: undefined=事務所払い / 'waiting'=立替中 / 'done'=精算済
+function toggleTatekae(id) {
+  const data = loadData();
+  const e = data.find(x => x.id === id);
+  if (!e) return;
+  if (!e.tatekae)           { e.tatekae = 'waiting'; delete e.seisanDate; }
+  else if (e.tatekae === 'waiting') { e.tatekae = 'done'; e.seisanDate = new Date().toISOString().slice(0,10); }
+  else                      { delete e.tatekae; delete e.seisanDate; }
+  saveData(data);
+  renderAll();
+}
+
+// ---- フォーマット ----
+function fmt(n) { return '¥' + Math.abs(n).toLocaleString('ja-JP'); }
+
+function methodLabel(m, rate) {
+  if (m === 'full')    return '<span class="badge green">全額充当</span>';
+  if (m === 'anbu')    return `<span class="badge">按分 ${rate}%</span>`;
+  if (m === 'partial') return '<span class="badge orange">一部充当</span>';
+  if (m === 'exclude') return '<span class="badge" style="background:#f5f5f5;color:#999">充当除外</span>';
+  return m;
+}
+
+// ---- レンダリング ----
+function renderAll() {
+  const data = loadData();
+  const s    = loadSettings();
+  const kofu = s.kofu || 0;
+
+  const totalAmount  = data.reduce((a, e) => a + e.amount, 0);
+  const totalCharge  = data.reduce((a, e) => a + calcCharge(e), 0);
+  const totalJibara  = data.reduce((a, e) => a + calcJibara(e), 0);
+  const nokori       = kofu - totalCharge;
+  // 未精算立替額 = 立替中（tatekae='waiting'）のもの
+  const totalMiseisan = data
+    .filter(e => e.tatekae === 'waiting')
+    .reduce((a, e) => a + calcCharge(e), 0);
+
+  // カード
+  document.getElementById('c-kofu').textContent     = kofu ? fmt(kofu) : '未設定';
+  document.getElementById('c-total').textContent    = fmt(totalAmount);
+  document.getElementById('c-anbu').textContent     = fmt(totalCharge);
+  document.getElementById('c-nokori').textContent   = kofu ? fmt(nokori) : '―';
+  document.getElementById('c-jibara').textContent   = fmt(totalJibara);
+  document.getElementById('c-miseisan').textContent = fmt(totalMiseisan);
+
+  // ヘッダー残額
+  const hdr = document.getElementById('header-nokori');
+  if (kofu) {
+    hdr.textContent = `残額 ${fmt(nokori)}`;
+    hdr.style.background = nokori < 0 ? 'rgba(198,40,40,0.6)' : 'rgba(255,255,255,0.15)';
+  } else { hdr.textContent = ''; }
+
+  document.getElementById('header-nendo').textContent = getNendo() + ' 年度';
+
+  // 進捗バー
+  const pct = kofu ? Math.round(totalCharge / kofu * 100) : 0;
+  document.getElementById('progress-pct').textContent = kofu ? `${pct}% 使用` : '交付額未設定';
+  const bar = document.getElementById('progress-bar');
+  bar.style.width = (kofu ? Math.min(pct, 100) : 0) + '%';
+  bar.className = 'progress-bar' + (pct > 90 ? ' over' : pct > 70 ? ' warn' : '');
+
+  // 費目別集計
+  const cats = ['調査研究費','広報費','広聴費','要請・陳情活動費','会議費','研修費','資料購入費','事務費','その他'];
+  const catGrid = document.getElementById('category-grid');
+  catGrid.innerHTML = '';
+  cats.forEach(c => {
+    const items = data.filter(e => e.cat === c);
+    if (!items.length) return;
+    const charge = items.reduce((a, e) => a + calcCharge(e), 0);
+    const jibara = items.reduce((a, e) => a + calcJibara(e), 0);
+    const div = document.createElement('div');
+    div.className = 'cat-card';
+    div.innerHTML = `<span class="cat-name">${c}</span><div style="text-align:right"><div class="cat-amount">${fmt(charge)}</div>${jibara > 0 ? `<div style="font-size:10px;color:#c62828">自己負担 ${fmt(jibara)}</div>` : ''}</div>`;
+    catGrid.appendChild(div);
+  });
+  if (!catGrid.children.length) {
+    catGrid.innerHTML = '<div style="color:#bbb;font-size:12px;padding:10px">支出を追加すると費目別集計が表示されます</div>';
+  }
+
+  renderTable();
+}
+
+let filterJibaraOnly  = false;
+let filterMiseisanOnly = false;
+let sortKey = 'date';
+let sortDir = 1; // 1=昇順 -1=降順
+
+function setSort(key) {
+  if (sortKey === key) sortDir = -sortDir;
+  else { sortKey = key; sortDir = key === 'amount' || key === 'charge' || key === 'jibara' ? -1 : 1; }
+  // ヘッダーのクラスを更新
+  document.querySelectorAll('th.sortable').forEach(th => {
+    th.classList.remove('sort-asc', 'sort-desc');
+  });
+  const idx = {'date':0,'cat':1,'amount':5,'charge':7,'jibara':8};
+  const ths = document.querySelectorAll('th.sortable');
+  const keys = ['date','cat','amount','charge','jibara','tatekae'];
+  keys.forEach((k, i) => {
+    if (k === sortKey) ths[i].classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+  });
+  renderTable();
+}
+
+function toggleJibaraFilter() {
+  filterJibaraOnly = !filterJibaraOnly;
+  document.getElementById('card-jibara').classList.toggle('active', filterJibaraOnly);
+  document.getElementById('jibara-filter-badge').style.display = filterJibaraOnly ? 'inline' : 'none';
+  if (filterJibaraOnly) document.getElementById('entry-tbody').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  renderTable();
+}
+
+function toggleMiseisanFilter() {
+  filterMiseisanOnly = !filterMiseisanOnly;
+  document.getElementById('card-miseisan').classList.toggle('active', filterMiseisanOnly);
+  document.getElementById('miseisan-filter-badge').style.display = filterMiseisanOnly ? 'inline' : 'none';
+  if (filterMiseisanOnly) document.getElementById('entry-tbody').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  renderTable();
+}
+
+function renderTable() {
+  const filterCat   = document.getElementById('f-filter-cat').value;
+  const filterMonth = document.getElementById('f-filter-month').value;
+  let data = loadData();
+  if (filterCat)          data = data.filter(e => e.cat === filterCat);
+  if (filterMonth)        data = data.filter(e => e.date.slice(0,7) === filterMonth);
+  if (filterJibaraOnly)   data = data.filter(e => calcJibara(e) > 0);
+  if (filterMiseisanOnly) data = data.filter(e => e.tatekae === 'waiting');
+
+  // ソート
+  data.sort((a, b) => {
+    let va, vb;
+    if      (sortKey === 'date')   { va = a.date || ''; vb = b.date || ''; }
+    else if (sortKey === 'cat')    { va = a.cat  || ''; vb = b.cat  || ''; }
+    else if (sortKey === 'amount') { va = a.amount;      vb = b.amount; }
+    else if (sortKey === 'charge') { va = calcCharge(a); vb = calcCharge(b); }
+    else if (sortKey === 'jibara') { va = calcJibara(a); vb = calcJibara(b); }
+    else if (sortKey === 'tatekae') {
+      const order = { 'waiting': 0, undefined: 1, 'done': 2 };
+      va = order[a.tatekae] ?? 1; vb = order[b.tatekae] ?? 1;
+    }
+    else return 0;
+    return va < vb ? -sortDir : va > vb ? sortDir : 0;
+  });
+
+  const tbody = document.getElementById('entry-tbody');
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="13" class="empty-state">支出データがありません</td></tr>';
+    document.getElementById('entry-tfoot').innerHTML = '';
+    return;
+  }
+
+  tbody.innerHTML = data.map(e => {
+    const charge = calcCharge(e);
+    const jibara = calcJibara(e);
+    const tatekae = e.tatekae;
+    const tatekaeLabel = tatekae === 'waiting'
+      ? `<button class="seisan-btn" style="background:#fce4ec;border-color:#ef9a9a;color:#c62828" onclick="toggleTatekae(${e.id})">🔴 立替中</button>`
+      : tatekae === 'done'
+        ? `<button class="seisan-btn done" onclick="toggleTatekae(${e.id})" title="精算済 ${e.seisanDate||''}">✓ 精算済</button>`
+        : `<button class="seisan-btn" style="color:#ccc;border-color:#eee" onclick="toggleTatekae(${e.id})">事務所払</button>`;
+    return `<tr class="${tatekae === 'done' ? 'seisan-done' : ''}">
+      <td>${e.date}</td>
+      <td>${e.cat || ''}</td>
+      <td style="color:#666">${e.subcat || ''}</td>
+      <td>${e.desc}</td>
+      <td style="color:#666">${e.payto || ''}</td>
+      <td class="num">${fmt(e.amount)}</td>
+      <td>${methodLabel(e.method, e.rate)}</td>
+      <td class="num" style="color:#1565c0">${fmt(charge)}</td>
+      <td class="jibara">${jibara > 0 ? fmt(jibara) : '―'}</td>
+      <td style="text-align:center">${tatekaeLabel}</td>
+      <td style="font-size:11px;color:#999">${e.note || ''}</td>
+      <td style="font-size:11px;color:#aaa;white-space:nowrap">${(e.registeredAt||'').slice(0,10) || '―'}</td>
+      <td><button class="btn-del" onclick="deleteEntry(${e.id})">削除</button></td>
+    </tr>`;
+  }).join('');
+
+  const sumAmount = data.reduce((a, e) => a + e.amount, 0);
+  const sumCharge = data.reduce((a, e) => a + calcCharge(e), 0);
+  const sumJibara = data.reduce((a, e) => a + calcJibara(e), 0);
+  const sumMiseisan = data.filter(e => e.tatekae === 'waiting').reduce((a, e) => a + calcCharge(e), 0);
+  document.getElementById('entry-tfoot').innerHTML = `
+    <tr style="background:#f5f7fa;font-weight:bold">
+      <td colspan="5" style="font-size:12px;padding:9px 10px">合計 ${data.length}件</td>
+      <td class="num">${fmt(sumAmount)}</td>
+      <td></td>
+      <td class="num" style="color:#1565c0">${fmt(sumCharge)}</td>
+      <td class="jibara">${fmt(sumJibara)}</td>
+      <td style="text-align:center;font-size:11px;color:#6a1b9a">未精算<br>${fmt(sumMiseisan)}</td>
+      <td colspan="2"></td>
+    </tr>`;
+}
+
+// ---- CSV取り込み ----
+let importRows = [];
+let parsedCSV = null; // { headers, rows }
+// 一度認識した列マッピングを記憶（ブラウザに保存）
+const MAPPING_KEY = 'seimu_col_mapping';
+
+// セムカンの列名 → 内部フィールド のマッピング辞書（よくある列名を網羅）
+const COL_MAP = {
+  '支出日': 'date', '支払日': 'date', '日付': 'date', '年月日': 'date',
+  '経費項目': 'cat', '費目': 'cat', '項目': 'cat', '経費区分': 'cat',
+  '経費細目': 'subcat', '細目': 'subcat', '小区分': 'subcat',
+  '摘要': 'desc', '内容': 'desc', '支出内容': 'desc', '件名': 'desc', '用途': 'desc',
+  '支払先': 'payto', '支出先': 'payto', '相手先': 'payto', '業者名': 'payto',
+  '金額': 'amount', '支出金額': 'amount', '支出額': 'amount', '合計金額': 'amount', '税込金額': 'amount',
+  '充当方法': 'method', '充当区分': 'method', '按分区分': 'method',
+  '按分率': 'rate', '按分割合': 'rate', '按分１': 'rate', '按分1': 'rate',
+  '充当金額': 'charge', '充当額': 'charge', '一部充当金額': 'charge', '政務活動費充当額': 'charge',
+  '備考': 'note', 'メモ': 'note', '注記': 'note',
+};
+
+const FIELD_LABELS = {
+  date: '支出日', cat: '経費項目', subcat: '経費細目', desc: '摘要',
+  payto: '支払先', amount: '金額', method: '充当方法', rate: '按分率',
+  charge: '充当金額', note: '備考', skip: '（スキップ）'
+};
+
+function parseMethod(v) {
+  if (!v) return 'anbu';
+  if (v.includes('全額')) return 'full';
+  if (v.includes('一部')) return 'partial';
+  if (v.includes('除外')) return 'exclude';
+  if (v.includes('按分') || v.includes('%')) return 'anbu';
+  return 'anbu';
+}
+
+function parseCSVText(text) {
+  const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) return null;
+  // タブ区切り or カンマ区切り 自動検出
+  const sep = lines[0].split('\t').length > lines[0].split(',').length ? '\t' : ',';
+  const parseLine = line => {
+    if (sep === '\t') return line.split('\t').map(v => v.replace(/^"|"$/g,'').trim());
+    const result = []; let cur = '', inq = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inq = !inq; }
+      else if (c === ',' && !inq) { result.push(cur.trim()); cur = ''; }
+      else { cur += c; }
+    }
+    result.push(cur.trim());
+    return result.map(v => v.replace(/^"|"$/g,'').trim());
+  };
+  const headers = parseLine(lines[0]);
+  const rows = lines.slice(1).map(l => parseLine(l));
+  return { headers, rows };
+}
+
+function buildFieldMap(headers, savedMapping) {
+  const fm = {};
+  headers.forEach((h, i) => {
+    const key = h.trim();
+    if (savedMapping && savedMapping[key]) {
+      fm[i] = savedMapping[key];
+    } else if (COL_MAP[key]) {
+      fm[i] = COL_MAP[key];
+    }
+  });
+  return fm;
+}
+
+function rowToEntry(row, fieldMap, ri) {
+  const e = { id: Date.now() + ri, method: 'anbu', rate: 50, partial: 0, cat: '調査研究費' };
+  Object.entries(fieldMap).forEach(([i, field]) => {
+    const val = (row[i] || '').trim();
+    if (!val || field === 'skip') return;
+    if (field === 'date') {
+      e.date = val.replace(/\//g, '-')
+        .replace(/^(\d{4})-(\d{1,2})-(\d{1,2})$/, (_, y, m, d) => `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`);
+    } else if (field === 'cat')    { e.cat = val; }
+    else if (field === 'subcat')   { e.subcat = val; }
+    else if (field === 'desc')     { e.desc = val; }
+    else if (field === 'payto')    { e.payto = val; }
+    else if (field === 'amount')   { e.amount = parseInt(val.replace(/[,，¥￥\s]/g,''), 10) || 0; }
+    else if (field === 'method')   { e.method = parseMethod(val); }
+    else if (field === 'rate')     { e.rate = parseInt(val.replace(/[%％]/g,''), 10) || 50; }
+    else if (field === 'charge')   { e._charge = parseInt(val.replace(/[,，¥￥\s]/g,''), 10) || 0; }
+    else if (field === 'note')     { e.note = val; }
+  });
+  // 充当金額から按分率を逆算
+  if (e.method === 'anbu' && e._charge && e.amount) {
+    const r = Math.round(e._charge / e.amount * 100);
+    if (r > 0 && r <= 100) e.rate = r;
+  }
+  return e;
+}
+
+function readCSVFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const tryRead = (encoding) => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      let text = ev.target.result;
+      if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+      if (encoding === 'UTF-8' && /\ufffd/.test(text)) { tryRead('Shift-JIS'); return; }
+      document.getElementById('csv-paste').value = text;
+      previewCSV();
+    };
+    reader.readAsText(file, encoding);
+  };
+  tryRead('UTF-8');
+}
+
+function previewCSV() {
+  const text = document.getElementById('csv-paste').value.trim();
+  const errEl  = document.getElementById('import-error');
+  const prevEl = document.getElementById('import-preview');
+  const setupEl = document.getElementById('mapping-setup');
+  errEl.style.display = 'none';
+  importRows = [];
+
+  if (!text) {
+    prevEl.style.display = 'none';
+    setupEl.style.display = 'none';
+    document.getElementById('import-btn').style.display = 'none';
+    return;
+  }
+
+  parsedCSV = parseCSVText(text);
+  if (!parsedCSV) {
+    errEl.textContent = 'データを読み込めませんでした。CSVかタブ区切りのデータを選択または貼り付けてください。';
+    errEl.style.display = 'block'; return;
+  }
+
+  const { headers, rows } = parsedCSV;
+  // 保存済みマッピングを読む
+  let savedMapping = {};
+  try { savedMapping = JSON.parse(localStorage.getItem(MAPPING_KEY) || '{}'); } catch(e) {}
+
+  const fieldMap = buildFieldMap(headers, savedMapping);
+  const mappedCount = Object.values(fieldMap).filter(v => v !== 'skip').length;
+  const hasAmount = Object.values(fieldMap).includes('amount');
+
+  // 未認識列が多い or 金額列がない → 手動マッピング画面を表示
+  if (!hasAmount || mappedCount < 2) {
+    showManualMapping(headers, fieldMap);
+    prevEl.style.display = 'none';
+    return;
+  }
+
+  setupEl.style.display = 'none';
+  buildPreview(rows, fieldMap);
+}
+
+function showManualMapping(headers, currentMap) {
+  const setupEl = document.getElementById('mapping-setup');
+  const grid = document.getElementById('manual-mapping-grid');
+  const fieldOptions = Object.entries(FIELD_LABELS).map(([v, l]) =>
+    `<option value="${v}">${l}</option>`).join('');
+
+  grid.innerHTML = headers.map((h, i) => {
+    const current = currentMap[i] || 'skip';
+    return `<div style="display:flex;align-items:center;gap:8px;background:#fafafa;padding:6px 8px;border-radius:6px;">
+      <span style="flex:1;font-size:12px;color:#333;font-weight:bold">${h}</span>
+      <select data-col="${i}" style="flex:1;border:1px solid #ddd;border-radius:5px;padding:4px 6px;font-size:12px;">
+        ${Object.entries(FIELD_LABELS).map(([v, l]) =>
+          `<option value="${v}" ${v === current ? 'selected' : ''}>${l}</option>`
+        ).join('')}
+      </select>
+    </div>`;
+  }).join('');
+
+  setupEl.style.display = 'block';
+}
+
+function applyManualMapping() {
+  if (!parsedCSV) return;
+  const { headers, rows } = parsedCSV;
+  const selects = document.querySelectorAll('#manual-mapping-grid select');
+  const fieldMap = {};
+  const saveMap = {};
+  selects.forEach(sel => {
+    const i = parseInt(sel.dataset.col, 10);
+    const v = sel.value;
+    if (v !== 'skip') {
+      fieldMap[i] = v;
+      saveMap[headers[i].trim()] = v;
+    }
+  });
+  // マッピングをブラウザに保存（次回以降自動認識）
+  try { localStorage.setItem(MAPPING_KEY, JSON.stringify(saveMap)); } catch(e) {}
+  document.getElementById('mapping-setup').style.display = 'none';
+  buildPreview(rows, fieldMap);
+}
+
+function buildPreview(rows, fieldMap) {
+  const errEl  = document.getElementById('import-error');
+  const prevEl = document.getElementById('import-preview');
+
+  importRows = rows
+    .map((row, ri) => rowToEntry(row, fieldMap, ri))
+    .filter(e => e.amount > 0);
+
+  if (!importRows.length) {
+    errEl.textContent = '取り込める行が見つかりませんでした。「金額」列が正しく設定されているか確認してください。';
+    errEl.style.display = 'block'; prevEl.style.display = 'none'; return;
+  }
+
+  // マッピング表示バッジ
+  const { headers } = parsedCSV;
+  const mapDiv = document.getElementById('col-mapping');
+  mapDiv.innerHTML = Object.entries(fieldMap).map(([i, f]) =>
+    `<span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-size:11px">
+      ${headers[i]} → ${FIELD_LABELS[f]}
+    </span>`
+  ).join('');
+
+  // プレビューテーブル
+  const th = s => `<th style="padding:6px 8px;border-bottom:1px solid #e0e0e0;white-space:nowrap">${s}</th>`;
+  const td = (s, r) => `<td style="padding:5px 8px;border-bottom:1px solid #f0f0f0;${r?'text-align:right':''}">${s}</td>`;
+  document.getElementById('preview-table-wrap').innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:11px;">
+      <thead><tr style="background:#f5f7fa">${th('日付')}${th('経費項目')}${th('摘要')}${th('支払先')}${th('金額')}${th('充当方法')}${th('充当額')}</tr></thead>
+      <tbody>${importRows.map(e => `<tr>
+        ${td(e.date||'―')}
+        ${td(e.cat||'―')}
+        ${td(e.desc||'―')}
+        ${td(e.payto||'')}
+        ${td(fmt(e.amount),true)}
+        ${td(e.method==='full'?'全額':e.method==='anbu'?`按分${e.rate}%`:e.method==='partial'?'一部充当':'除外')}
+        ${td(`<span style="color:#1565c0">${fmt(calcCharge(e))}</span>`,true)}
+      </tr>`).join('')}</tbody>
+    </table>`;
+
+  document.getElementById('import-count').textContent = `${importRows.length}件を取り込みます`;
+  prevEl.style.display = 'block';
+  document.getElementById('import-btn').style.display = 'block';
+}
+
+function doImport() {
+  if (!importRows.length) return;
+  const merged = [...loadData(), ...importRows];
+  merged.sort((a, b) => (a.date||'').localeCompare(b.date||''));
+  saveData(merged);
+  closeImport();
+  renderAll();
+  alert(`${importRows.length}件を取り込みました`);
+}
+
+function closeImport() {
+  document.getElementById('import-modal').style.display = 'none';
+  document.getElementById('csv-paste').value = '';
+  document.getElementById('csv-file').value = '';
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('mapping-setup').style.display = 'none';
+  document.getElementById('import-error').style.display = 'none';
+  document.getElementById('import-btn').style.display = 'none';
+  importRows = [];
+  parsedCSV = null;
+}
+
+// ---- CSVエクスポート ----
+function exportCSV() {
+  const data = loadData();
+  if (!data.length) { alert('データがありません'); return; }
+  const header = ['支出日','経費項目','経費細目','摘要','支払先','支出金額','充当方法','按分率','充当額','自己負担','精算','精算日','備考'];
+  const rows = data.map(e => [
+    e.date, e.cat, e.subcat || '', e.desc, e.payto || '',
+    e.amount, e.method, e.method === 'anbu' ? e.rate + '%' : '',
+    calcCharge(e), calcJibara(e),
+    e.tatekae === 'waiting' ? '立替中' : e.tatekae === 'done' ? '精算済' : '事務所払',
+    e.seisanDate || '', e.note || ''
+  ]);
+  const csv = [header, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `政務活動費_${getNendo()}年度.csv`;
+  a.click();
+}
+
+// ---- 初期化 ----
+window.onload = async function() {
+  const s = loadSettings();
+  if (s.kofu) document.getElementById('kofu-input').value = s.kofu;
+  const lastNendo = localStorage.getItem('seimu_last_nendo');
+  if (lastNendo) document.getElementById('nendo-select').value = lastNendo;
+  document.getElementById('header-nendo').textContent = getNendo() + ' 年度';
+  ghUpdateStatus();
+  updateMethodUI();
+  await ghPull(); // GitHubから最新データを取得
+  renderAll();
+};
+</script>
+</body>
+</html>
