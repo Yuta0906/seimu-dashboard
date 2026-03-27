@@ -146,7 +146,7 @@
     "desc": "2025年12月分　法人会費",
     "note": "年会費の対価\n研修会参加費・会報等資料代\n\n支出日　2025年12月23日　埼玉県議会自由民主党議員団　金子裕太",
     "registeredAt": "2026/03/26 14:32:13",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851713,
@@ -204,7 +204,8 @@
     "payto": "全京都個人タクシー協同組合（個人）SOUDA   TAXI",
     "desc": "視察　交通費",
     "note": "埼玉県議会自由民主党議員団",
-    "registeredAt": "2026/03/26 16:28:16"
+    "registeredAt": "2026/03/26 16:28:16",
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851717,
@@ -481,7 +482,7 @@
     "payto": "坂本晃氏　旭日雙光章受章祝賀会との意見交換会会費",
     "desc": "埼玉県議会自由民主党議員団",
     "registeredAt": "2026/03/26 15:56:40",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851736,
@@ -1534,7 +1535,8 @@
     "amount": 7780,
     "payto": "Adobe",
     "desc": "Creative  Cloud  Pro（2025年4月9日～5月8日）",
-    "registeredAt": "2026/03/19 11:24:25"
+    "registeredAt": "2026/03/19 11:24:25",
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851814,
@@ -1590,7 +1592,7 @@
     "desc": "Microsoft  365  Copilot",
     "note": "金子　裕太",
     "registeredAt": "2026/03/20 12:24:31",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851818,
@@ -1756,7 +1758,8 @@
     "amount": 7780,
     "payto": "Adobe",
     "desc": "Creative  Cloud  Pro（2025年5月9日～6月8日）",
-    "registeredAt": "2026/03/19 11:25:16"
+    "registeredAt": "2026/03/19 11:25:16",
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851830,
@@ -1771,7 +1774,7 @@
     "desc": "Microsoft  365  Copilot",
     "note": "金子　裕太",
     "registeredAt": "2026/03/20 12:25:24",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851831,
@@ -1896,7 +1899,8 @@
     "amount": 7780,
     "payto": "Adobe",
     "desc": "Creative  Cloud  Pro（2025年6月9日～7月8日）",
-    "registeredAt": "2026/03/19 11:25:58"
+    "registeredAt": "2026/03/19 11:25:58",
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851840,
@@ -1925,7 +1929,7 @@
     "desc": "Microsoft  365  Copilot",
     "note": "金子　裕太",
     "registeredAt": "2026/03/20 12:26:19",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851843,
@@ -2146,7 +2150,8 @@
     "amount": 7780,
     "payto": "Adobe",
     "desc": "Creative  Cloud  Pro（2025年7月9日～8月8日）",
-    "registeredAt": "2026/03/19 11:26:39"
+    "registeredAt": "2026/03/19 11:26:39",
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851859,
@@ -2161,7 +2166,7 @@
     "desc": "Microsoft  365  Copilot",
     "note": "金子　裕太",
     "registeredAt": "2026/03/20 12:27:49",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851860,
@@ -2313,7 +2318,8 @@
     "amount": 7780,
     "payto": "Adobe",
     "desc": "Creative  Cloud  Pro（2025年8月9日～9月8日）",
-    "registeredAt": "2026/03/19 11:27:21"
+    "registeredAt": "2026/03/19 11:27:21",
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851871,
@@ -2342,7 +2348,7 @@
     "desc": "Microsoft  365  Copilot",
     "note": "金子　裕太",
     "registeredAt": "2026/03/20 12:28:39",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851873,
@@ -2480,7 +2486,8 @@
     "amount": 7780,
     "payto": "Adobe",
     "desc": "Creative  Cloud  Pro（2025年9月9日～10月8日）",
-    "registeredAt": "2026/03/19 11:28:20"
+    "registeredAt": "2026/03/19 11:28:20",
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851883,
@@ -2495,7 +2502,7 @@
     "desc": "Microsoft  365  Copilot",
     "note": "金子　裕太",
     "registeredAt": "2026/03/20 12:29:25",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851884,
@@ -2662,7 +2669,8 @@
     "amount": 7780,
     "payto": "Adobe",
     "desc": "Creative  Cloud  Pro（2025年10月9日～11月8日）",
-    "registeredAt": "2026/03/19 11:29:05"
+    "registeredAt": "2026/03/19 11:29:05",
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851897,
@@ -2677,7 +2685,7 @@
     "desc": "Microsoft  365  Copilot",
     "note": "金子　裕太",
     "registeredAt": "2026/03/20 12:30:14",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851898,
@@ -2830,7 +2838,8 @@
     "amount": 7780,
     "payto": "Adobe",
     "desc": "Creative  Cloud  Pro（2025年11月9日～12月8日）",
-    "registeredAt": "2026/03/19 11:29:43"
+    "registeredAt": "2026/03/19 11:29:43",
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851909,
@@ -2872,7 +2881,7 @@
     "desc": "Microsoft  365  Copilot",
     "note": "金子　裕太",
     "registeredAt": "2026/03/20 12:31:01",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851912,
@@ -2916,7 +2925,7 @@
     "desc": "Manus  AI",
     "note": "金子　裕太",
     "registeredAt": "2026/03/19 14:50:54",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851915,
@@ -3041,7 +3050,8 @@
     "amount": 7780,
     "payto": "Adobe",
     "desc": "Creative  Cloud  Pro（2025年12月9日～2026年1月8日）",
-    "registeredAt": "2026/03/19 11:30:23"
+    "registeredAt": "2026/03/19 11:30:23",
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851924,
@@ -3208,7 +3218,8 @@
     "amount": 7780,
     "payto": "Adobe",
     "desc": "Creative  Cloud  Pro（2026年1月9日～2月8日）",
-    "registeredAt": "2026/03/19 11:31:04"
+    "registeredAt": "2026/03/19 11:31:04",
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851936,
@@ -3459,7 +3470,8 @@
     "amount": 7780,
     "payto": "Adobe",
     "desc": "Creative  Cloud  Pro（2026年2月9日～3月8日）",
-    "registeredAt": "2026/03/19 11:31:43"
+    "registeredAt": "2026/03/19 11:31:43",
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851955,
@@ -3628,7 +3640,8 @@
     "payto": "Google",
     "desc": "Google  Workspace  Business  Standard（2026年2月1日～2月28日）",
     "note": "金子　裕太",
-    "registeredAt": "2026/03/19 13:47:55"
+    "registeredAt": "2026/03/19 13:47:55",
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851967,
@@ -3698,7 +3711,8 @@
     "amount": 7780,
     "payto": "Adobe",
     "desc": "Creative  Cloud  Pro（2026年3月9日～4月8日）",
-    "registeredAt": "2026/03/19 11:32:29"
+    "registeredAt": "2026/03/19 11:32:29",
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851972,
@@ -3987,7 +4001,7 @@
     "desc": "ガソリン代",
     "note": "埼玉県議会自由民主党議員団",
     "registeredAt": "2025/09/29 15:45:36",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851994,
@@ -4002,7 +4016,7 @@
     "desc": "ガソリン代",
     "note": "埼玉県議会自由民主党議員団",
     "registeredAt": "2025/08/27 12:01:00",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851995,
@@ -4062,7 +4076,7 @@
     "desc": "ガソリン代",
     "note": "埼玉県議会自由民主党議員団",
     "registeredAt": "2025/08/27 13:13:11",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578851999,
@@ -4106,7 +4120,7 @@
     "desc": "ガソリン代",
     "note": "埼玉県議会自由民主党議員団",
     "registeredAt": "2025/09/29 15:46:59",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578852002,
@@ -4151,7 +4165,7 @@
     "desc": "ガソリン代",
     "note": "埼玉県議会自由民主党議員団",
     "registeredAt": "2026/02/20 14:59:49",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578852005,
@@ -4196,7 +4210,7 @@
     "desc": "ガソリン代",
     "note": "埼玉県議会自由民主党議員団",
     "registeredAt": "2026/02/20 14:59:34",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578852008,
@@ -4241,7 +4255,7 @@
     "desc": "ガソリン代",
     "note": "埼玉県議会自由民主党議員団",
     "registeredAt": "2026/02/20 14:59:18",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578852011,
@@ -4256,7 +4270,7 @@
     "desc": "ガソリン代",
     "note": "埼玉県議会自由民主党議員団",
     "registeredAt": "2026/02/20 14:58:35",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578852012,
@@ -4271,7 +4285,7 @@
     "desc": "ガソリン代",
     "note": "埼玉県議会自由民主党議員団",
     "registeredAt": "2026/02/20 14:57:58",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578852013,
@@ -4286,7 +4300,7 @@
     "desc": "ガソリン代",
     "note": "埼玉県議会自由民主党議員団",
     "registeredAt": "2026/02/20 14:57:09",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578852014,
@@ -4301,7 +4315,7 @@
     "desc": "ガソリン代",
     "note": "埼玉県議会自由民主党議員団",
     "registeredAt": "2026/02/20 14:56:39",
-    "tatekae": null
+    "tatekae": "waiting"
   },
   {
     "id": 1774578852015,
